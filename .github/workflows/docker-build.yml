@@ -22,4 +22,4 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: yourusername/vyos:latest
+        tags: martinkeat/unraidvyos:latest
