@@ -1,21 +1,23 @@
 # Stage 1: Prepare VyOS
 FROM debian:buster-slim as vyos-prep
 
-# Set environment variables to avoid interactive dialogues during installation
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Install necessary packages
 RUN apt-get update && apt-get install -y \
     curl \
+    jq \
     squashfs-tools \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /vyos
 
-# Download the latest VyOS ISO
-# Replace this URL with the command to dynamically fetch the latest release
-RUN curl -L -o vyos.iso 'https://downloads.vyos.io/?dir=rolling/current/amd64'
+# Fetch the latest release tag from GitHub
+RUN LATEST_TAG=$(curl -s https://api.github.com/repos/vyos/vyos-rolling-nightly-builds/releases/latest | jq -r '.tag_name') \
+    && echo "Latest release tag is $LATEST_TAG"
+
+# Construct the download URL using the latest tag
+# Replace this with the appropriate URL format for VyOS releases
+RUN curl -L -o vyos.iso "https://github.com/vyos/vyos-rolling-nightly-builds/releases/download/${LATEST_TAG}/vyos-${LATEST_TAG}-amd64.iso"
 
 # Create directories for unsquashing the ISO
 RUN mkdir /vyos/unsquashfs
